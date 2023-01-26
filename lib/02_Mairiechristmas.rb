@@ -44,10 +44,3 @@ arr_ville_page.each do |j|
     end
 end 
 
-
-
-
-
-# Make Hash
-#resule_hash = Hash[arr_symbol.zip arr_price.map]
-#puts resule_hash
