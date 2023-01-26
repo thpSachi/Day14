@@ -2,26 +2,51 @@ require 'nokogiri'
 require 'open-uri'
  
 # 対象のURL
-url = "http://annuaire-des-mairies.com/"
+root_url = "http://annuaire-des-mairies.com/"
  
 # NokogiriでURLの情報を取得する
-rootpage = Nokogiri::HTML(URI.open(url),nil,"utf-8")
+root_page = Nokogiri::HTML(URI.open(root_url),nil,"utf-8")
 
-# Get Symbol
-arr_region = [] 
-rootpage.xpath('//td/a').each do |link|
-    #arr_symbol.push(link.content)
-    arr_region.push(link['href'])
-    puts arr_region
+arr_region_page = [] 
+arr_ville_page = [] 
+
+# Get Link from Root page
+root_page.xpath('//td/a/@href').each do |root_link|
+    arr_region_page.push(root_link.content)
 end
 
-page = Nokogiri::HTML(URI.open(url),nil,"utf-8")
+# Get Link from Region page
+arr_region_page.each do |i|
+    region_url = root_url + i
 
-# Get Price
-arr_price = [] 
-page.xpath('//a[contains(@class, "cmc-link")]/span').each do |link|
-    arr_price.push(link.content)
+    begin 
+        region_page = Nokogiri::HTML(URI.open(region_url),nil,"utf-8")
+        region_page.xpath('//tbody/tr/td/a/@href').each do |region_link|
+            arr_ville_page.push(region_link.content)
+        end
+    rescue => e
+        puts "rescue."
+    end
+
 end
+
+# Get Email Adress from Village page
+arr_ville_page.each do |j|
+    ville_url = root_url + j
+
+    begin 
+        ville_page = Nokogiri::HTML(URI.open(ville_url),nil,"utf-8")
+        ville_page.xpath('//tbody/tr/td[text("@mairie")]').each do |adress|
+            puts adress
+        end
+    rescue => e
+        puts "Error.  Push [Ctrl + C]"
+    end
+end 
+
+
+
+
 
 # Make Hash
 #resule_hash = Hash[arr_symbol.zip arr_price.map]
